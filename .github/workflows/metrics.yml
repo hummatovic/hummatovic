@@ -30,9 +30,6 @@ jobs:
           plugin_isocalendar: yes
           plugin_isocalendar_duration: half-year
 
-          plugin_achievements: yes
-          plugin_achievements_threshold: C
-
           # === Appearance ===
           config_timezone: UTC
           config_padding: 6%, 10%
