@@ -1,0 +1,37 @@
+name: Activity
+
+on:
+  schedule:
+    - cron: "17 0 * * *"   # Daily, shortly after midnight UTC
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/scripts/render_activity.py"
+      - ".github/workflows/activity.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Render activity card
+        # Add an ACTIVITY_TOKEN secret (a personal access token) to include private contributions.
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACTIVITY_TOKEN || secrets.GITHUB_TOKEN }}
+        run: python3 .github/scripts/render_activity.py --user hummatovic --out assets/activity.svg
+
+      - name: Commit if changed
+        run: |
+          git add assets/activity.svg
+          if git diff --cached --quiet; then
+            echo "No changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update activity card [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
